@@ -1,12 +1,12 @@
 {
-  "name": "RIYASH PAY",
-  "short_name": "Riyash Pay",
-  "description": "Personal UPI payment requests",
+  "name": "OneUPay",
+  "short_name": "OneUPay",
+  "description": "A clearer merchant workspace for payment links and checkout.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
-  "background_color": "#f4f6fa",
-  "theme_color": "#101827",
+  "background_color": "#091a2a",
+  "theme_color": "#091a2a",
   "icons": [
     {
       "src": "/icon.svg",
