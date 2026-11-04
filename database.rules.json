@@ -11,7 +11,7 @@
     "oneupayLinks": {
       "$uid": {
         ".read": "auth != null && auth.uid == $uid",
-        ".write": "auth != null && auth.uid == $uid",
+        ".write": "auth != null && auth.uid == $uid && auth.token.email_verified == true",
         ".indexOn": [
           "createdAt"
         ]
@@ -20,7 +20,7 @@
     "oneupayPublicLinks": {
       "$linkId": {
         ".read": true,
-        ".write": "auth != null && newData.exists() && ((!data.exists() && newData.child('ownerUid').val() == auth.uid) || (data.exists() && data.child('ownerUid').val() == auth.uid && newData.child('ownerUid').val() == auth.uid))",
+        ".write": "auth != null && auth.token.email_verified == true && newData.exists() && ((!data.exists() && newData.child('ownerUid').val() == auth.uid) || (data.exists() && data.child('ownerUid').val() == auth.uid && newData.child('ownerUid').val() == auth.uid))",
         ".validate": "newData.hasChildren(['ownerUid','merchantName','description','amountPaise','currency','upiId','mode','status','createdAt']) && newData.child('merchantName').isString() && newData.child('merchantName').val().length > 0 && newData.child('merchantName').val().length <= 80 && newData.child('description').isString() && newData.child('description').val().length <= 100 && newData.child('amountPaise').isNumber() && newData.child('amountPaise').val() >= 100 && newData.child('amountPaise').val() <= 100000000 && newData.child('currency').val() == 'INR' && newData.child('upiId').isString() && newData.child('upiId').val().length <= 256 && newData.child('status').isString() && (newData.child('status').val() == 'created' || newData.child('status').val() == 'paid' || newData.child('status').val() == 'cancelled')"
       }
     },
@@ -29,7 +29,7 @@
         ".read": "auth != null && auth.uid == $uid",
         "$linkId": {
           "$claimId": {
-            ".write": "newData.exists() && ((auth != null && auth.uid == $uid) || (!data.exists() && root.child('oneupayPublicLinks').child($linkId).child('ownerUid').val() == $uid && root.child('oneupayPublicLinks').child($linkId).child('status').val() == 'created' && (root.child('oneupayPublicLinks').child($linkId).child('expiresAt').val() == null || root.child('oneupayPublicLinks').child($linkId).child('expiresAt').val() > now) && newData.child('amountPaise').val() == root.child('oneupayPublicLinks').child($linkId).child('amountPaise').val() && newData.child('status').val() == 'submitted' && newData.child('utr').isString() && newData.child('utr').val().length >= 8 && newData.child('utr').val().length <= 30))",
+            ".write": "newData.exists() && ((auth != null && auth.uid == $uid && auth.token.email_verified == true) || (!data.exists() && root.child('oneupayPublicLinks').child($linkId).child('ownerUid').val() == $uid && root.child('oneupayPublicLinks').child($linkId).child('status').val() == 'created' && (root.child('oneupayPublicLinks').child($linkId).child('expiresAt').val() == null || root.child('oneupayPublicLinks').child($linkId).child('expiresAt').val() > now) && newData.child('amountPaise').val() == root.child('oneupayPublicLinks').child($linkId).child('amountPaise').val() && newData.child('status').val() == 'submitted' && newData.child('utr').isString() && newData.child('utr').val().length >= 8 && newData.child('utr').val().length <= 30))",
             ".validate": "newData.hasChildren(['id','utr','amountPaise','status','createdAt']) && newData.child('utr').isString() && newData.child('utr').val().length >= 8 && newData.child('utr').val().length <= 30 && newData.child('amountPaise').isNumber() && newData.child('createdAt').isNumber() && newData.child('status').val() == 'submitted'"
           }
         }
