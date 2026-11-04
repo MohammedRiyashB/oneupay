@@ -1,8 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import {
-  addDoc, collection, doc, onSnapshot, orderBy,
-  query, serverTimestamp, updateDoc
-} from "firebase/firestore";
+  onValue, orderByChild, push, ref, set, update, query
+} from "firebase/database";
 import {
   createUserWithEmailAndPassword, onAuthStateChanged, signInWithEmailAndPassword,
   signOut
@@ -51,8 +50,9 @@ export default function App() {
     setRequest(null);
     setRequestLoading(true);
     setError("");
-    return onSnapshot(doc(db, "paymentRequests", requestId), snap => {
-      setRequest(snap.exists() ? { id: snap.id, ...snap.data() } : null);
+    return onValue(ref(db, `paymentRequests/${requestId}`), snap => {
+      const value = snap.val();
+      setRequest(value ? { id: requestId, ...value } : null);
       setRequestLoading(false);
     }, e => {
       setError(e.message);
@@ -61,8 +61,13 @@ export default function App() {
   }, [requestId]);
   useEffect(() => {
     if (!user) { setRequests([]); return; }
-    const q = query(collection(db, "paymentRequests"), orderBy("createdAt", "desc"));
-    return onSnapshot(q, snap => setRequests(snap.docs.map(d => ({ id: d.id, ...d.data() }))), e => setError(e.message));
+    const q = query(ref(db, "paymentRequests"), orderByChild("createdAt"));
+    return onValue(q, snap => {
+      const value = snap.val() || {};
+      const rows = Object.entries(value).map(([id, data]) => ({ id, ...data }));
+      rows.sort((a, b) => Number(b.createdAt || 0) - Number(a.createdAt || 0));
+      setRequests(rows);
+    }, e => setError(e.message));
   }, [user]);
 
   const totals = useMemo(() => ({
@@ -77,14 +82,15 @@ export default function App() {
     if (!Number.isFinite(value) || value <= 0 || value > 100000) return setError("Enter an amount between ₹1 and ₹1,00,000.");
     setBusy(true);
     try {
-      const ref = await addDoc(collection(db, "paymentRequests"), {
+      const newRequestRef = push(ref(db, "paymentRequests"));
+      await set(newRequestRef, {
         amount: value, description: description.trim() || "Payment",
         payeeName: PAYEE_NAME, upiId: UPI_ID, status: "pending",
-        utr: "", payerName: "", payerNote: "", createdAt: serverTimestamp(),
+        utr: "", payerName: "", payerNote: "", createdAt: Date.now(),
         createdBy: user.uid, submittedAt: null, verifiedAt: null
       });
-      setRequestId(ref.id);
-      history.replaceState({}, "", `?request=${encodeURIComponent(ref.id)}`);
+      setRequestId(newRequestRef.key);
+      history.replaceState({}, "", `?request=${encodeURIComponent(newRequestRef.key)}`);
       setAmount(String(DEFAULT_AMOUNT)); setDescription("Payment");
       setPage("home");
     } catch (e) { setError(e.message); }
@@ -98,10 +104,10 @@ export default function App() {
     if (clean.length < 8 || clean.length > 30) return setError("Enter the UPI transaction reference/UTR from your payment app.");
     setBusy(true);
     try {
-      await updateDoc(doc(db, "paymentRequests", request.id), {
+      await update(ref(db, `paymentRequests/${request.id}`), {
         utr: clean, payerName: payerName.trim().slice(0, 80),
         payerNote: payerNote.trim().slice(0, 200), status: "submitted",
-        submittedAt: serverTimestamp()
+        submittedAt: Date.now()
       });
       setUtr(""); setPayerNote("");
       setError("");
@@ -112,12 +118,12 @@ export default function App() {
   async function approve(r) {
     if (!confirm(`Mark ${money(r.amount)} as PAID? First verify this credit in your own bank/UPI app.`)) return;
     try {
-      await updateDoc(doc(db, "paymentRequests", r.id), { status: "paid", verifiedAt: serverTimestamp() });
+      await update(ref(db, `paymentRequests/${r.id}`), { status: "paid", verifiedAt: Date.now() });
     } catch (e) { setError(e.message); }
   }
   async function reject(r) {
     if (!confirm("Reject this submitted payment claim?")) return;
-    try { await updateDoc(doc(db, "paymentRequests", r.id), { status: "pending", utr: "", payerName: "", payerNote: "", submittedAt: null }); }
+    try { await update(ref(db, `paymentRequests/${r.id}`), { status: "pending", utr: "", payerName: "", payerNote: "", submittedAt: null }); }
     catch (e) { setError(e.message); }
   }
 
