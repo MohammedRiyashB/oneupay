@@ -6,7 +6,7 @@ import { QRCodeSVG } from "qrcode.react";
 import {
   Activity, ArrowRight, ArrowUpRight, BadgeCheck, BarChart3, Building2, Check,
   CheckCircle2, ChevronDown, CircleHelp, Code2, Copy, CreditCard, Download,
-  Fingerprint, Globe2, IndianRupee, LayoutDashboard, Link2, LockKeyhole, LogIn,
+  FileText, Fingerprint, Globe2, IndianRupee, LayoutDashboard, Link2, LockKeyhole, LogIn,
   LogOut, Menu, MessageCircle, Plus, QrCode, Search, Send, Settings, Shield,
   ShieldCheck, Sparkles, Wallet, X, Zap, Clock3
 } from "lucide-react";
