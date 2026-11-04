@@ -6,10 +6,11 @@ OneUPay is an early-stage merchant-workspace and payment-link product initiative
 - Original OneUPay branding and responsive animated landing page.
 - Open Firebase email/password signup and login.
 - UID-isolated merchant profiles, payment links and payer claims.
-- Merchant-created UPI QR / intent links using each merchant's own UPI ID.
+- Merchant-created UPI QR / intent links with downloadable QR files using each merchant's own UPI ID.
 - Public hosted payment-link page and payer-submitted UTR claims.
-- Merchant-controlled manual verification, transaction history, CSV export and analytics.
-- About, Terms, Privacy, Security, Acceptable Use, Payment Disclosure and developer preview pages.
+- Merchant-controlled manual verification, printable/save-as-PDF receipts, transaction history, CSV export and analytics.
+- Email verification before merchants create public payment links.
+- About, Terms, Privacy, Security, Acceptable Use, Payment Disclosure, Refunds & Disputes, Complaints/Grievance and developer preview pages.
 - Legacy ?request=<id> reads from the existing paymentRequests path are retained; legacy records are not migrated or deleted.
 - Installable PWA shell. Offline cache never stores /api/ responses or Firebase payment data.
 
