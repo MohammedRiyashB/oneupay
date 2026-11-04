@@ -1,40 +1,11 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // RIYASH PAY admin: Firebase Authentication UID.
-    function isAdmin() {
-      return request.auth != null
-        && request.auth.uid == "tOp2Sl2YfjcLsCpmP07UsrLz4BC3";
-    }
-
-    match /paymentRequests/{requestId} {
-      // Public request pages can read a request by its unguessable document ID.
-      allow get: if true;
-      allow list: if isAdmin();
-
-      allow create: if isAdmin()
-        && request.resource.data.createdBy == request.auth.uid
-        && request.resource.data.status == "pending"
-        && request.resource.data.amount is number
-        && request.resource.data.amount > 0
-        && request.resource.data.amount <= 100000
-        && request.resource.data.upiId == "mohdriyash10-3@okhdfcbank";
-
-      // Only the admin can approve/reject. Public users can submit a UTR claim.
-      allow update: if isAdmin()
-        || (
-          resource.data.status != "paid"
-          && request.resource.data.diff(resource.data).affectedKeys()
-            .hasOnly(["utr", "payerName", "payerNote", "status", "submittedAt"])
-          && request.resource.data.status == "submitted"
-          && request.resource.data.utr is string
-          && request.resource.data.utr.size() >= 8
-          && request.resource.data.utr.size() <= 30
-          && request.resource.data.payerName is string
-          && request.resource.data.payerNote is string
-        );
-
-      allow delete: if isAdmin();
+    // Firestore is not used by the OneUPay application.
+    // All application data is stored in Firebase Realtime Database.
+    // Deny all Firestore client access unless a future reviewed feature needs it.
+    match /{document=**} {
+      allow read, write: if false;
     }
   }
 }
