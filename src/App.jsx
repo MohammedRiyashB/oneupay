@@ -29,6 +29,7 @@ export default function App() {
   const [page, setPage] = useState("home");
   const [requestId, setRequestId] = useState(new URLSearchParams(location.search).get("request"));
   const [request, setRequest] = useState(null);
+  const [requestLoading, setRequestLoading] = useState(Boolean(new URLSearchParams(location.search).get("request")));
   const [requests, setRequests] = useState([]);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -42,10 +43,21 @@ export default function App() {
 
   useEffect(() => onAuthStateChanged(auth, u => { setUser(u); setAuthReady(true); }), []);
   useEffect(() => {
-    if (!requestId) return;
+    if (!requestId) {
+      setRequest(null);
+      setRequestLoading(false);
+      return;
+    }
+    setRequest(null);
+    setRequestLoading(true);
+    setError("");
     return onSnapshot(doc(db, "paymentRequests", requestId), snap => {
       setRequest(snap.exists() ? { id: snap.id, ...snap.data() } : null);
-    }, e => setError(e.message));
+      setRequestLoading(false);
+    }, e => {
+      setError(e.message);
+      setRequestLoading(false);
+    });
   }, [requestId]);
   useEffect(() => {
     if (!user) { setRequests([]); return; }
@@ -110,7 +122,7 @@ export default function App() {
   }
 
   if (!authReady) return <main className="center">Loading Riyash Pay…</main>;
-  if (requestId && !user) return <PublicRequest request={request} error={error} busy={busy}
+  if (requestId && !user) return <PublicRequest request={request} loading={requestLoading} error={error} busy={busy}
     utr={utr} setUtr={setUtr} payerName={payerName} setPayerName={setPayerName}
     payerNote={payerNote} setPayerNote={setPayerNote} submitUtr={submitUtr} />;
   return <div className="shell">
@@ -179,8 +191,9 @@ function Login({email,setEmail,password,setPassword,setError}) {
   </section></main>;
 }
 
-function PublicRequest({request,error,busy,utr,setUtr,payerName,setPayerName,payerNote,setPayerNote,submitUtr}) {
-  if (!request) return <main className="public-wrap"><section className="panel"><h1>Payment request not found</h1><p>This link may be invalid or the request may have been removed.</p></section></main>;
+function PublicRequest({request,loading,error,busy,utr,setUtr,payerName,setPayerName,payerNote,setPayerNote,submitUtr}) {
+  if (loading) return <main className="public-wrap"><section className="panel"><h1>Loading payment request…</h1><p>Please wait while we securely retrieve the request.</p></section></main>;
+  if (!request) return <main className="public-wrap"><section className="panel"><h1>Payment request not found</h1><p>{error || "This link may be invalid or the request may have been removed."}</p></section></main>;
   const paid = request.status === "paid";
   return <main className="public-wrap">
     <section className="panel public-card">
