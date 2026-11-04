@@ -1,11 +1,11 @@
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
+import { getDatabase } from "firebase/database";
 
-// Firebase Web App configuration for the RIYASH PAY project.
 const firebaseConfig = {
   apiKey: "AIzaSyBGnt8mBocqJX9y_FEp1zPnRuHdluUM5SM",
   authDomain: "airseeds.firebaseapp.com",
+  databaseURL: "https://airseeds-default-rtdb.firebaseio.com",
   projectId: "airseeds",
   storageBucket: "airseeds.firebasestorage.app",
   messagingSenderId: "161778874117",
@@ -15,4 +15,4 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
-export const db = getFirestore(app);
+export const db = getDatabase(app);
