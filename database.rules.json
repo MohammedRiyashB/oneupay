@@ -1,0 +1,16 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    "paymentRequests": {
+      ".read": "auth != null && auth.uid == 'tOp2Sl2YfjcLsCpmP07UsrLz4BC3'",
+      ".indexOn": [
+        "createdAt"
+      ],
+      "$requestId": {
+        ".read": true,
+        ".write": "(auth != null && auth.uid == 'tOp2Sl2YfjcLsCpmP07UsrLz4BC3') || (data.exists() && data.child('status').val() != 'paid' && newData.exists() && newData.child('status').val() == 'submitted' && newData.child('utr').isString() && newData.child('utr').val().length >= 8 && newData.child('utr').val().length <= 30 && newData.child('payerName').isString() && newData.child('payerNote').isString() && newData.child('amount').val() == data.child('amount').val() && newData.child('description').val() == data.child('description').val() && newData.child('payeeName').val() == data.child('payeeName').val() && newData.child('upiId').val() == data.child('upiId').val() && newData.child('createdAt').val() == data.child('createdAt').val() && newData.child('createdBy').val() == data.child('createdBy').val() && newData.child('verifiedAt').val() == data.child('verifiedAt').val())"
+      }
+    }
+  }
+}
