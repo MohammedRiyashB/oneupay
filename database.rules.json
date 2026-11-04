@@ -29,7 +29,7 @@
         ".read": "auth != null && auth.uid == $uid",
         "$linkId": {
           "$claimId": {
-            ".write": "newData.exists() && ((auth != null && auth.uid == $uid) || (!data.exists() && root.child('oneupayPublicLinks').child($linkId).child('ownerUid').val() == $uid && root.child('oneupayPublicLinks').child($linkId).child('status').val() == 'created' && newData.child('amountPaise').val() == root.child('oneupayPublicLinks').child($linkId).child('amountPaise').val() && newData.child('status').val() == 'submitted' && newData.child('utr').isString() && newData.child('utr').val().length >= 8 && newData.child('utr').val().length <= 30))",
+            ".write": "newData.exists() && ((auth != null && auth.uid == $uid) || (!data.exists() && root.child('oneupayPublicLinks').child($linkId).child('ownerUid').val() == $uid && root.child('oneupayPublicLinks').child($linkId).child('status').val() == 'created' && (root.child('oneupayPublicLinks').child($linkId).child('expiresAt').val() == null || root.child('oneupayPublicLinks').child($linkId).child('expiresAt').val() > now) && newData.child('amountPaise').val() == root.child('oneupayPublicLinks').child($linkId).child('amountPaise').val() && newData.child('status').val() == 'submitted' && newData.child('utr').isString() && newData.child('utr').val().length >= 8 && newData.child('utr').val().length <= 30))",
             ".validate": "newData.hasChildren(['id','utr','amountPaise','status','createdAt']) && newData.child('utr').isString() && newData.child('utr').val().length >= 8 && newData.child('utr').val().length <= 30 && newData.child('amountPaise').isNumber() && newData.child('createdAt').isNumber() && newData.child('status').val() == 'submitted'"
           }
         }
